@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.chance.gmoneymap">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_main_logo"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_main_logo_round"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme"
+        android:usesCleartextTraffic="true">
+        <activity
+            android:name=".DownloadActivity"
+            android:theme="@style/Theme.AppCompat.Light"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".Dialogs.SettingDateDialog"
+            android:theme="@style/DialogTheme"
+            android:screenOrientation="portrait" />
+        <activity android:name=".NewNoticeActivity" />
+        <activity
+            android:name=".NoticeActivity"
+            android:theme="@style/Theme.AppCompat.Light"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Dialogs.InformationDialog"
+            android:theme="@style/DialogTheme"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".ResultActivity"
+            android:theme="@style/Theme.AppCompat.Light.DarkActionBar"
+            android:screenOrientation="portrait" />
+        <activity android:name=".SplashActivity"
+            android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="@string/kakaolink_host"
+                    android:scheme="@string/kakao_scheme" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".MapActivity"
+            android:screenOrientation="portrait" />
+
+        <meta-data
+            android:name="com.kakao.sdk.AppKey"
+            android:value="@string/kakao_app_key" />
+    </application>
+
+</manifest>

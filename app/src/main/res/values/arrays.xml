@@ -1,0 +1,78 @@
+<resources>
+    <!-- Reply Preference -->
+    <string-array name="reply_entries">
+        <item>Reply</item>
+        <item>Reply to all</item>
+    </string-array>
+
+    <string-array name="reply_values">
+        <item>reply</item>
+        <item>reply_all</item>
+    </string-array>
+
+    <string-array name="cityName">
+        <item>시/군을 선택해주세요!</item>
+        <item>가평군</item>
+        <item>고양시</item>
+        <item>과천시</item>
+        <item>광명시</item>
+        <item>광주시</item>
+        <item>구리시</item>
+        <item>군포시</item>
+        <item>김포시</item>
+        <item>남양주시</item>
+        <item>동두천시</item>
+        <item>부천시</item>
+        <item>성남시</item>
+        <item>수원시</item>
+        <item>시흥시</item>
+        <item>안산시</item>
+        <item>안성시</item>
+        <item>안양시</item>
+        <item>양주시</item>
+        <item>양평군</item>
+        <item>여주시</item>
+        <item>연천군</item>
+        <item>오산시</item>
+        <item>용인시</item>
+        <item>의왕시</item>
+        <item>의정부시</item>
+        <item>이천시</item>
+        <item>파주시</item>
+        <item>평택시</item>
+        <item>포천시</item>
+        <item>하남시</item>
+        <item>화성시</item>
+    </string-array>
+
+    <string-array name="categoryName">
+        <item>모두보기</item>
+        <item>음식1</item>
+        <item>음식2</item>
+        <item>상가1</item>
+        <item>상가2</item>
+        <item>가게1</item>
+        <item>가게2</item>
+        <item>카페/마트/편의점</item>
+        <item>병원/약국/기타의료</item>
+        <item>숙박/여행</item>
+        <item>레저</item>
+        <item>도서/미용/문화</item>
+        <item>가전/가구/의류</item>
+        <item>학원/교육</item>
+        <item>서비스</item>
+        <item>제조업</item>
+        <item>주유소</item>
+        <item>꽃/과일/떡/농업</item>
+        <item>건축/건설</item>
+        <item>기타</item>
+    </string-array>
+
+    <string-array name="searchWhat">
+        <item>상호명</item>
+        <item>주소</item>
+        <item>전화번호</item>
+    </string-array>
+
+
+</resources>

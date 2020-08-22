@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "92132451671",
+    "firebase_url": "https://gmoneymap-9efc5.firebaseio.com",
+    "project_id": "gmoneymap-9efc5",
+    "storage_bucket": "gmoneymap-9efc5.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:92132451671:android:e4c5166b0d9bdb335b8a12",
+        "android_client_info": {
+          "package_name": "com.chance.gmoneymap"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "92132451671-9ajl420u4mtdq2q7qjb5id1hrhrji0km.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.chance.gmoneymap",
+            "certificate_hash": "9172aa1e9dc424c71b9f05935a6b7a029eca9383"
+          }
+        },
+        {
+          "client_id": "92132451671-3al14tmpkl8lc94752ik87gospabd0cl.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDwFNwS6VWZ7fBAbyyCbFs82Nwg01xoB5Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "92132451671-3al14tmpkl8lc94752ik87gospabd0cl.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,280 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MapActivity">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <RelativeLayout
+            android:id="@+id/mMapView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <LinearLayout
+            android:id="@+id/ll_top"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tv_address"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="30sp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="30sp"
+                android:layout_marginBottom="12dp"
+                android:background="@drawable/shape_addressbar"
+                android:elevation="6dp"
+                android:padding="12dp"
+                android:singleLine="true"
+                android:text="current address"
+                android:textSize="16sp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="60dp"
+                android:layout_marginEnd="60dp">
+                <TextView
+                    android:id="@+id/tv_myArea"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:padding="4dp"
+                    android:gravity="center"
+                    android:background="@drawable/area_bg_left_selector"
+                    android:textColor="@drawable/area_text_selector"
+                    android:text="내주변검색"
+                    android:onClick="toggleSearchWhere"/>
+                <TextView
+                    android:id="@+id/tv_mapArea"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:padding="4dp"
+                    android:gravity="center"
+                    android:background="@drawable/area_bg_right_selector"
+                    android:textColor="@drawable/area_text_selector"
+                    android:text="현재위치검색"
+                    android:onClick="toggleSearchWhere"/>
+            </LinearLayout>
+
+            <HorizontalScrollView
+                android:id="@+id/scrollView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
+                android:scrollbars="none">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/tv_all"
+                        android:text="모두보기"
+                        style="@style/CategoryTextView"
+                        android:layout_marginStart="20dp"
+                        android:onClick="categoryClick"/>
+
+                    <TextView
+                        android:id="@+id/tv_food1"
+                        android:text="음식점1"
+                        style="@style/CategoryTextView"
+                        android:onClick="categoryClick" />
+
+                    <TextView
+                        android:id="@+id/tv_food2"
+                        android:text="음식점2"
+                        style="@style/CategoryTextView"
+                        android:onClick="categoryClick" />
+
+                    <TextView
+                        android:id="@+id/tv_sales1"
+                        android:text="상가1"
+                        style="@style/CategoryTextView"
+                        android:onClick="categoryClick" />
+
+                    <TextView
+                        android:id="@+id/tv_sales2"
+                        android:text="상가2"
+                        style="@style/CategoryTextView"
+                        android:onClick="categoryClick" />
+
+                    <TextView
+                        android:id="@+id/tv_business1"
+                        android:text="가게1"
+                        style="@style/CategoryTextView"
+                        android:onClick="categoryClick" />
+
+                    <TextView
+                        android:id="@+id/tv_business2"
+                        android:text="가게2"
+                        style="@style/CategoryTextView"
+                        android:onClick="categoryClick" />
+
+                    <TextView
+                        android:id="@+id/tv_cafe"
+                        android:text="카페/마트/편의점"
+                        style="@style/CategoryTextView"
+                        android:onClick="categoryClick" />
+
+                    <TextView
+                        android:id="@+id/tv_hospital"
+                        android:text="병원/약국/기타의료"
+                        style="@style/CategoryTextView"
+                        android:onClick="categoryClick" />
+
+                    <TextView
+                        android:id="@+id/tv_accommodation"
+                        android:text="숙박/여행"
+                        style="@style/CategoryTextView"
+                        android:onClick="categoryClick" />
+
+                    <TextView
+                        android:id="@+id/tv_leisure"
+                        android:text="레저"
+                        style="@style/CategoryTextView"
+                        android:onClick="categoryClick" />
+
+                    <TextView
+                        android:id="@+id/tv_culture"
+                        android:text="도서/미용/문화"
+                        style="@style/CategoryTextView"
+                        android:onClick="categoryClick" />
+
+                    <TextView
+                        android:id="@+id/tv_home"
+                        android:text="가전/가구/의류"
+                        style="@style/CategoryTextView"
+                        android:onClick="categoryClick" />
+
+                    <TextView
+                        android:id="@+id/tv_academy"
+                        android:text="학원/교육"
+                        style="@style/CategoryTextView"
+                        android:onClick="categoryClick" />
+
+                    <TextView
+                        android:id="@+id/tv_service"
+                        android:text="서비스"
+                        style="@style/CategoryTextView"
+                        android:onClick="categoryClick" />
+
+                    <TextView
+                        android:id="@+id/tv_manufacturing"
+                        android:text="제조업"
+                        style="@style/CategoryTextView"
+                        android:onClick="categoryClick" />
+
+                    <TextView
+                        android:id="@+id/tv_oil"
+                        android:text="주유소"
+                        style="@style/CategoryTextView"
+                        android:onClick="categoryClick" />
+
+                    <TextView
+                        android:id="@+id/tv_flower"
+                        android:text="꽃/과일/떡/농업"
+                        style="@style/CategoryTextView"
+                        android:onClick="categoryClick" />
+
+                    <TextView
+                        android:id="@+id/tv_construction"
+                        android:text="건축/건설"
+                        style="@style/CategoryTextView"
+                        android:onClick="categoryClick" />
+
+                    <TextView
+                        android:id="@+id/tv_etc"
+                        android:text="기타"
+                        style="@style/CategoryTextView"
+                        android:onClick="categoryClick" />
+                </LinearLayout>
+            </HorizontalScrollView>
+
+            <TextView
+                android:id="@+id/tv_warning"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="30sp"
+                android:layout_marginTop="12dp"
+                android:layout_marginEnd="30sp"
+                android:background="@drawable/shape_warningbar"
+                android:elevation="6dp"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
+                android:paddingStart="12dp"
+                android:paddingEnd="4dp"
+                android:singleLine="true"
+                android:drawableStart="@drawable/ic_warning"
+                android:drawablePadding="4dp"
+                android:gravity="center_vertical"
+                android:ellipsize="marquee"
+                android:marqueeRepeatLimit="marquee_forever"
+                android:textColor="@android:color/black"
+                android:text="검색 속도를 높이려면 데이터를 다운로드 해주세요!"
+                android:textSize="12sp"/>
+        </LinearLayout>
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab_gps"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="76dp"
+            android:backgroundTint="@android:color/white"
+            android:elevation="6dp"
+            android:src="@drawable/ic_gps_off"
+            app:borderWidth="0dp" />
+    </RelativeLayout>
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/nestedScrollView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/shape_bottom_panel"
+        android:elevation="6dp"
+        app:behavior_hideable="true"
+        app:behavior_peekHeight="60dp"
+        app:layout_behavior="@string/bottom_sheet_behavior">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <com.google.android.material.tabs.TabLayout
+                android:id="@+id/tabLayout"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:elevation="6dp"
+                app:tabGravity="fill"
+                app:tabSelectedTextColor="@color/colorPrimaryLighter"
+                app:tabMode="fixed"
+                app:tabIndicatorColor="@color/colorPrimaryLighter"
+                app:tabIndicatorHeight="3dp">
+
+            </com.google.android.material.tabs.TabLayout>
+
+            <androidx.viewpager.widget.ViewPager
+                android:id="@+id/viewPager"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

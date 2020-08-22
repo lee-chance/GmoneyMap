@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">경기지역 화폐지도</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string name="api_key">4ec8d71038ca488cb7805fb00e2b5309</string>
+    <string name="email">729mail2@gmail.com</string>
+</resources>

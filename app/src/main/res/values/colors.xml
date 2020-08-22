@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimaryHeavyLighter">#48A7EB</color>
+    <color name="colorPrimaryLighter">#037BD5</color>
+    <color name="colorPrimary">#0168B3</color>
+    <color name="colorPrimaryDarkBefore">#005DB2</color>
+    <color name="colorPrimaryDark">#004B94</color>
+    <color name="colorAccent">#FB6E91</color>
+    <color name="colorLightGray">#E9e9e9</color>
+
+    <color name="G_colorGreen">#BFD735</color>
+    <color name="G_colorBackBlue">#08489B</color>
+    <color name="G_colorMint">#47BAC8</color>
+    <color name="G_colorDarkBlue">#003B51</color>
+</resources>

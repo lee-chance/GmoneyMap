@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginStart="16dp"
+    android:layout_marginEnd="16dp"
+    tools:context=".ResultActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tv_resultCount"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="end"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_searchResult"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/tv_loading"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:visibility="gone"
+            android:text="잠시만 기다려 주세요..."/>
+
+<!--        <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:visibility="gone">
+
+                    <TextView
+                        android:id="@+id/tv_prev"
+                        style="@style/NavigationTextView"
+                        android:onClick="naviClick"
+                        android:layout_marginEnd="4dp"
+                        android:visibility="invisible"
+                        android:text="\u003c" />
+
+                    <TextView
+                        android:id="@+id/tv_first"
+                        style="@style/NavigationTextView"
+                        android:onClick="naviClick"
+                        android:textColor="@color/colorPrimaryLighter"
+                        android:text="1" />
+
+                    <TextView
+                        android:id="@+id/tv_second"
+                        style="@style/NavigationTextView"
+                        android:onClick="naviClick"
+                        android:textColor="@android:color/black"
+                        android:text="2" />
+
+                    <TextView
+                        android:id="@+id/tv_third"
+                        style="@style/NavigationTextView"
+                        android:onClick="naviClick"
+                        android:textColor="@android:color/black"
+                        android:text="3" />
+
+                    <TextView
+                        android:id="@+id/tv_fourth"
+                        style="@style/NavigationTextView"
+                        android:onClick="naviClick"
+                        android:textColor="@android:color/black"
+                        android:text="4" />
+
+                    <TextView
+                        android:id="@+id/tv_fifth"
+                        style="@style/NavigationTextView"
+                        android:onClick="naviClick"
+                        android:textColor="@android:color/black"
+                        android:text="5" />
+
+                    <TextView
+                        android:id="@+id/tv_next"
+                        style="@style/NavigationTextView"
+                        android:onClick="naviClick"
+                        android:layout_marginStart="4dp"
+                        android:text="\u003e" />
+                </LinearLayout>-->
+    </LinearLayout>
+</ScrollView>
