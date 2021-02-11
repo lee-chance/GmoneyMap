@@ -1,6 +1,7 @@
 package com.chance.gmoneymap;
 
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -10,6 +11,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -227,119 +229,133 @@ public class ResultActivity extends AppCompatActivity {
                     if (response.isSuccessful()) {
                         GmoneyClass result = response.body();
                         List<RegionMnyFacltStu> regionMnyFacltStus = result.getRegionMnyFacltStus();
-                        List<Head> heads = regionMnyFacltStus.get(0).getHead();
-                        final Integer listTotalCount = heads.get(0).getListTotalCount();
-                        int indexEnd = listTotalCount / 100 + 1;
+                        if(regionMnyFacltStus != null) {
+                            List<Head> heads = regionMnyFacltStus.get(0).getHead();
+                            final Integer listTotalCount = heads.get(0).getListTotalCount();
+                            int indexEnd = listTotalCount / 100 + 1;
 
-                        for (int pIndex = 1; pIndex <= indexEnd; pIndex++) {
-                            call = service.getSearchCity(getString(R.string.api_key), "json", pIndex, city);
-                            call.enqueue(new Callback<GmoneyClass>() {
-                                @Override
-                                public void onResponse(@NotNull Call<GmoneyClass> call, @NotNull Response<GmoneyClass> response) {
-                                    if (response.isSuccessful()) {
-                                        GmoneyClass result = response.body();
-                                        List<RegionMnyFacltStu> regionMnyFacltStus = result.getRegionMnyFacltStus();
-                                        List<Head> heads = regionMnyFacltStus.get(0).getHead();
-                                        RESULT results = heads.get(1).getRESULT();
-                                        if (results.getCODE().equals("INFO-000")) {
-                                            List<Row> rows = regionMnyFacltStus.get(1).getRow();
-                                            for (Row row : rows) {
-                                                rowCount++;
-                                                if (searchWhat.equals("상호명")) {
-                                                    String shopName = row.getShopName();
-                                                    if (searchResult.equals("")) {
-                                                        String category = row.getCategoryName();
+                            for (int pIndex = 1; pIndex <= indexEnd; pIndex++) {
+                                call = service.getSearchCity(getString(R.string.api_key), "json", pIndex, city);
+                                call.enqueue(new Callback<GmoneyClass>() {
+                                    @Override
+                                    public void onResponse(@NotNull Call<GmoneyClass> call, @NotNull Response<GmoneyClass> response) {
+                                        if (response.isSuccessful()) {
+                                            GmoneyClass result = response.body();
+                                            List<RegionMnyFacltStu> regionMnyFacltStus = result.getRegionMnyFacltStus();
+                                            List<Head> heads = regionMnyFacltStus.get(0).getHead();
+                                            RESULT results = heads.get(1).getRESULT();
+                                            if (results.getCODE().equals("INFO-000")) {
+                                                List<Row> rows = regionMnyFacltStus.get(1).getRow();
+                                                for (Row row : rows) {
+                                                    rowCount++;
+                                                    if (searchWhat.equals("상호명")) {
+                                                        String shopName = row.getShopName();
+                                                        if (searchResult.equals("")) {
+                                                            String category = row.getCategoryName();
+                                                            String roadAddress = row.getRoadAddress();
+                                                            String locationAddress = row.getLocationAddress();
+                                                            String telNumber = row.getTelNumber();
+                                                            String latitude = row.getLatitude();
+                                                            String longitude = row.getLongitude();
+                                                            DataModel data = new DataModel(shopName, category, roadAddress,
+                                                                    locationAddress, telNumber, latitude, longitude);
+                                                            dataModels.add(data);
+                                                        } else if (shopName.contains(searchResult)) {
+                                                            String category = row.getCategoryName();
+                                                            String roadAddress = row.getRoadAddress();
+                                                            String locationAddress = row.getLocationAddress();
+                                                            String telNumber = row.getTelNumber();
+                                                            String latitude = row.getLatitude();
+                                                            String longitude = row.getLongitude();
+                                                            DataModel data = new DataModel(shopName, category, roadAddress,
+                                                                    locationAddress, telNumber, latitude, longitude);
+                                                            dataModels.add(data);
+                                                        }
+                                                    } else if (searchWhat.equals("전화번호")) {
+                                                        String telNumber = row.getTelNumber();
+                                                        if (searchResult.equals("")) {
+                                                            String shopName = row.getShopName();
+                                                            String category = row.getCategoryName();
+                                                            String roadAddress = row.getRoadAddress();
+                                                            String locationAddress = row.getLocationAddress();
+                                                            String latitude = row.getLatitude();
+                                                            String longitude = row.getLongitude();
+                                                            DataModel data = new DataModel(shopName, category, roadAddress,
+                                                                    locationAddress, telNumber, latitude, longitude);
+                                                            dataModels.add(data);
+                                                        } else if (telNumber != null && telNumber.contains(searchResult)) {
+                                                            String shopName = row.getShopName();
+                                                            String category = row.getCategoryName();
+                                                            String roadAddress = row.getRoadAddress();
+                                                            String locationAddress = row.getLocationAddress();
+                                                            String latitude = row.getLatitude();
+                                                            String longitude = row.getLongitude();
+                                                            DataModel data = new DataModel(shopName, category, roadAddress,
+                                                                    locationAddress, telNumber, latitude, longitude);
+                                                            dataModels.add(data);
+                                                        }
+                                                    } else if (searchWhat.equals("주소")) {
                                                         String roadAddress = row.getRoadAddress();
                                                         String locationAddress = row.getLocationAddress();
-                                                        String telNumber = row.getTelNumber();
-                                                        String latitude = row.getLatitude();
-                                                        String longitude = row.getLongitude();
-                                                        DataModel data = new DataModel(shopName, category, roadAddress,
-                                                                locationAddress, telNumber, latitude, longitude);
-                                                        dataModels.add(data);
-                                                    } else if (shopName.contains(searchResult)) {
-                                                        String category = row.getCategoryName();
-                                                        String roadAddress = row.getRoadAddress();
-                                                        String locationAddress = row.getLocationAddress();
-                                                        String telNumber = row.getTelNumber();
-                                                        String latitude = row.getLatitude();
-                                                        String longitude = row.getLongitude();
-                                                        DataModel data = new DataModel(shopName, category, roadAddress,
-                                                                locationAddress, telNumber, latitude, longitude);
-                                                        dataModels.add(data);
+                                                        String address;
+                                                        if (roadAddress != null) {
+                                                            address = roadAddress;
+                                                        } else address = locationAddress;
+                                                        if (searchResult.equals("")) {
+                                                            String shopName = row.getShopName();
+                                                            String category = row.getCategoryName();
+                                                            String telNumber = row.getTelNumber();
+                                                            String latitude = row.getLatitude();
+                                                            String longitude = row.getLongitude();
+                                                            DataModel data = new DataModel(shopName, category, roadAddress,
+                                                                    locationAddress, telNumber, latitude, longitude);
+                                                            dataModels.add(data);
+                                                        } else if (address != null && address.contains(searchResult)) {
+                                                            String shopName = row.getShopName();
+                                                            String category = row.getCategoryName();
+                                                            String telNumber = row.getTelNumber();
+                                                            String latitude = row.getLatitude();
+                                                            String longitude = row.getLongitude();
+                                                            DataModel data = new DataModel(shopName, category, roadAddress,
+                                                                    locationAddress, telNumber, latitude, longitude);
+                                                            dataModels.add(data);
+                                                        }
                                                     }
-                                                } else if (searchWhat.equals("전화번호")) {
-                                                    String telNumber = row.getTelNumber();
-                                                    if (searchResult.equals("")) {
-                                                        String shopName = row.getShopName();
-                                                        String category = row.getCategoryName();
-                                                        String roadAddress = row.getRoadAddress();
-                                                        String locationAddress = row.getLocationAddress();
-                                                        String latitude = row.getLatitude();
-                                                        String longitude = row.getLongitude();
-                                                        DataModel data = new DataModel(shopName, category, roadAddress,
-                                                                locationAddress, telNumber, latitude, longitude);
-                                                        dataModels.add(data);
-                                                    } else if (telNumber != null && telNumber.contains(searchResult)) {
-                                                        String shopName = row.getShopName();
-                                                        String category = row.getCategoryName();
-                                                        String roadAddress = row.getRoadAddress();
-                                                        String locationAddress = row.getLocationAddress();
-                                                        String latitude = row.getLatitude();
-                                                        String longitude = row.getLongitude();
-                                                        DataModel data = new DataModel(shopName, category, roadAddress,
-                                                                locationAddress, telNumber, latitude, longitude);
-                                                        dataModels.add(data);
+                                                    tv_resultCount.setText(dataModels.size() + "개의 검색결과");
+                                                    if (dataModels.size() != 0) {
+                                                        DataAdapter dataAdapter = new DataAdapter(getApplicationContext(), dataModels);
+                                                        rv_searchResult.setAdapter(dataAdapter);
                                                     }
-                                                } else if (searchWhat.equals("주소")) {
-                                                    String roadAddress = row.getRoadAddress();
-                                                    String locationAddress = row.getLocationAddress();
-                                                    String address;
-                                                    if (roadAddress != null) {
-                                                        address = roadAddress;
-                                                    } else address = locationAddress;
-                                                    if (searchResult.equals("")) {
-                                                        String shopName = row.getShopName();
-                                                        String category = row.getCategoryName();
-                                                        String telNumber = row.getTelNumber();
-                                                        String latitude = row.getLatitude();
-                                                        String longitude = row.getLongitude();
-                                                        DataModel data = new DataModel(shopName, category, roadAddress,
-                                                                locationAddress, telNumber, latitude, longitude);
-                                                        dataModels.add(data);
-                                                    } else if (address != null && address.contains(searchResult)) {
-                                                        String shopName = row.getShopName();
-                                                        String category = row.getCategoryName();
-                                                        String telNumber = row.getTelNumber();
-                                                        String latitude = row.getLatitude();
-                                                        String longitude = row.getLongitude();
-                                                        DataModel data = new DataModel(shopName, category, roadAddress,
-                                                                locationAddress, telNumber, latitude, longitude);
-                                                        dataModels.add(data);
+                                                    if (rowCount == listTotalCount) {
+                                                        Toast.makeText(ResultActivity.this, "검색을 완료했습니다.", Toast.LENGTH_SHORT).show();
+                                                        progressDialog.dismiss();
                                                     }
                                                 }
-                                                tv_resultCount.setText(dataModels.size() + "개의 검색결과");
-                                                if (dataModels.size() != 0) {
-                                                    DataAdapter dataAdapter = new DataAdapter(getApplicationContext(), dataModels);
-                                                    rv_searchResult.setAdapter(dataAdapter);
-                                                }
-                                                if (rowCount == listTotalCount) {
-                                                    Toast.makeText(ResultActivity.this, "검색을 완료했습니다.", Toast.LENGTH_SHORT).show();
-                                                    progressDialog.dismiss();
-                                                }
+                                            } else {
+                                                progressDialog.setMessage(results.getCODE());
+                                                progressDialog.show();
                                             }
-                                        } else {
-                                            progressDialog.setMessage(results.getCODE());
-                                            progressDialog.show();
                                         }
                                     }
-                                }
 
-                                @Override
-                                public void onFailure(@NotNull Call<GmoneyClass> call, @NotNull Throwable t) {
-                                    Log.e("Chance", "" + t.getMessage());
-                                }
-                            });
+                                    @Override
+                                    public void onFailure(@NotNull Call<GmoneyClass> call, @NotNull Throwable t) {
+                                        Log.e("Chance", "" + t.getMessage());
+                                    }
+                                });
+                            }
+                        } else {
+                            progressDialog.dismiss();
+                            AlertDialog.Builder builder = new AlertDialog.Builder(ResultActivity.this);
+                            builder.setMessage(city+"는 더 이상 데이터를 제공하지 않습니다.")
+                                    .setPositiveButton("확인", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            onBackPressed();
+                                        }
+                                    });
+                            AlertDialog dialog = builder.create();
+                            dialog.show();
                         }
                     }
                 }
@@ -352,116 +368,4 @@ public class ResultActivity extends AppCompatActivity {
             });
         }
     }
-
-/*
-    private void setNavi() {
-        if (pIndex == 5 * page + 1) first = true;
-        if (pIndex == 5 * page + 2) second = true;
-        if (pIndex == 5 * page + 3) third = true;
-        if (pIndex == 5 * page + 4) fourth = true;
-        if (pIndex == 5 * page + 5) fifth = true;
-        if (pageDown) {
-            tv_first.setText((5 * page + 1) + "");
-            tv_second.setText((5 * page + 2) + "");
-            tv_third.setText((5 * page + 3) + "");
-            tv_fourth.setText((5 * page + 4) + "");
-            tv_fifth.setText((5 * page + 5) + "");
-        }
-        if (pageUP) {
-            tv_first.setText((5 * page + 1) + "");
-            tv_second.setText((5 * page + 2) + "");
-            tv_third.setText((5 * page + 3) + "");
-            tv_fourth.setText((5 * page + 4) + "");
-            tv_fifth.setText((5 * page + 5) + "");
-        }
-        if (first) {
-            tv_first.setTextColor(getResources().getColor(R.color.colorPrimaryLighter));
-            tv_second.setTextColor(getResources().getColor(android.R.color.black));
-            tv_third.setTextColor(getResources().getColor(android.R.color.black));
-            tv_fourth.setTextColor(getResources().getColor(android.R.color.black));
-            tv_fifth.setTextColor(getResources().getColor(android.R.color.black));
-        }
-        if (second) {
-            tv_first.setTextColor(getResources().getColor(android.R.color.black));
-            tv_second.setTextColor(getResources().getColor(R.color.colorPrimaryLighter));
-            tv_third.setTextColor(getResources().getColor(android.R.color.black));
-            tv_fourth.setTextColor(getResources().getColor(android.R.color.black));
-            tv_fifth.setTextColor(getResources().getColor(android.R.color.black));
-        }
-        if (third) {
-            tv_first.setTextColor(getResources().getColor(android.R.color.black));
-            tv_second.setTextColor(getResources().getColor(android.R.color.black));
-            tv_third.setTextColor(getResources().getColor(R.color.colorPrimaryLighter));
-            tv_fourth.setTextColor(getResources().getColor(android.R.color.black));
-            tv_fifth.setTextColor(getResources().getColor(android.R.color.black));
-        }
-        if (fourth) {
-            tv_first.setTextColor(getResources().getColor(android.R.color.black));
-            tv_second.setTextColor(getResources().getColor(android.R.color.black));
-            tv_third.setTextColor(getResources().getColor(android.R.color.black));
-            tv_fourth.setTextColor(getResources().getColor(R.color.colorPrimaryLighter));
-            tv_fifth.setTextColor(getResources().getColor(android.R.color.black));
-        }
-        if (fifth) {
-            tv_first.setTextColor(getResources().getColor(android.R.color.black));
-            tv_second.setTextColor(getResources().getColor(android.R.color.black));
-            tv_third.setTextColor(getResources().getColor(android.R.color.black));
-            tv_fourth.setTextColor(getResources().getColor(android.R.color.black));
-            tv_fifth.setTextColor(getResources().getColor(R.color.colorPrimaryLighter));
-        }
-        if (pIndex == 1) {
-            tv_prev.setVisibility(View.INVISIBLE);
-        } else {
-            tv_prev.setVisibility(View.VISIBLE);
-        }
-        if (pIndex == dataModels.size() / pSize) {
-            tv_next.setVisibility(View.INVISIBLE);
-        } else {
-            tv_next.setVisibility(View.VISIBLE);
-        }
-    }
-
-    public void naviClick(View view) {
-        pageUP = false;
-        pageDown = false;
-        first = false;
-        second = false;
-        third = false;
-        fourth = false;
-        fifth = false;
-        switch (view.getId()) {
-            case R.id.tv_prev:
-                if (pIndex == 5 * page + 1) {
-                    page--;
-                    pageDown = true;
-                }
-                pIndex--;
-                break;
-            case R.id.tv_next:
-                if (pIndex == 5 * page + 5) {
-                    page++;
-                    pageUP = true;
-                }
-                pIndex++;
-                break;
-            case R.id.tv_first:
-                pIndex = 5 * page + 1;
-                break;
-            case R.id.tv_second:
-                pIndex = 5 * page + 2;
-                break;
-            case R.id.tv_third:
-                pIndex = 5 * page + 3;
-                break;
-            case R.id.tv_fourth:
-                pIndex = 5 * page + 4;
-                break;
-            case R.id.tv_fifth:
-                pIndex = 5 * page + 5;
-                break;
-        }
-        setNavi();
-        requestSearchLocal();
-    }
-*/
 }

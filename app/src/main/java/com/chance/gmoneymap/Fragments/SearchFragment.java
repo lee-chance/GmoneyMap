@@ -73,7 +73,7 @@ public class SearchFragment extends Fragment {
         spn_searchWhat = v.findViewById(R.id.spn_searchWhat);
         et_search = v.findViewById(R.id.et_search);
         btn_search = v.findViewById(R.id.btn_search);
-        btn_searchFromMe = v.findViewById(R.id.btn_searchFromMe);
+//        btn_searchFromMe = v.findViewById(R.id.btn_searchFromMe);
 
         adapter_city = ArrayAdapter.createFromResource(getActivity(), R.array.cityName, android.R.layout.simple_spinner_item);
         adapter_city.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -117,21 +117,21 @@ public class SearchFragment extends Fragment {
             }
         });
 
-        btn_searchFromMe.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                getCurrentLocation();
-                Intent intent = new Intent(getActivity(), ResultActivity.class);
-                if(currentCity==null){
-                    Toast.makeText(getActivity(), "현 위치는 경기도가 아닙니다", Toast.LENGTH_SHORT).show();
-                } else if(currentCity.equals("error")){
-                    Toast.makeText(getActivity(), "다시 시도해주세요", Toast.LENGTH_SHORT).show();
-                } else {
-                    intent.putExtra("city", currentCity);
-                    intent.putExtra("searchFromMe", true);
-                }
-            }
-        });
+//        btn_searchFromMe.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                getCurrentLocation();
+//                Intent intent = new Intent(getActivity(), ResultActivity.class);
+//                if(currentCity==null){
+//                    Toast.makeText(getActivity(), "현 위치는 경기도가 아닙니다", Toast.LENGTH_SHORT).show();
+//                } else if(currentCity.equals("error")){
+//                    Toast.makeText(getActivity(), "다시 시도해주세요", Toast.LENGTH_SHORT).show();
+//                } else {
+//                    intent.putExtra("city", currentCity);
+//                    intent.putExtra("searchFromMe", true);
+//                }
+//            }
+//        });
 
         return v;
     }

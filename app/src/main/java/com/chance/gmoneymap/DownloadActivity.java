@@ -173,66 +173,80 @@ public class DownloadActivity extends AppCompatActivity {
                 if (response.isSuccessful()) {
                     GmoneyClass result = response.body();
                     List<RegionMnyFacltStu> regionMnyFacltStus = result.getRegionMnyFacltStus();
-                    List<Head> heads = regionMnyFacltStus.get(0).getHead();
-                    final Integer listTotalCount = heads.get(0).getListTotalCount();
-                    final int indexEnd = listTotalCount / 100 + 1;
+                    if(regionMnyFacltStus != null) {
+                        List<Head> heads = regionMnyFacltStus.get(0).getHead();
+                        final Integer listTotalCount = heads.get(0).getListTotalCount();
+                        final int indexEnd = listTotalCount / 100 + 1;
 
-                    for (int pIndex = 1; pIndex <= indexEnd; pIndex++) {
-                        call = service.getSearchCity(getString(R.string.api_key), "json", pIndex, city);
-                        call.enqueue(new Callback<GmoneyClass>() {
-                            @Override
-                            public void onResponse(@NotNull Call<GmoneyClass> call, @NotNull Response<GmoneyClass> response) {
-                                if (response.isSuccessful()) {
-                                    GmoneyClass result = response.body();
-                                    List<RegionMnyFacltStu> regionMnyFacltStus = result.getRegionMnyFacltStus();
-                                    List<Head> heads = regionMnyFacltStus.get(0).getHead();
-                                    RESULT results = heads.get(1).getRESULT();
-                                    if (results.getCODE().equals("INFO-000")) {
-                                        List<Row> rows = regionMnyFacltStus.get(1).getRow();
-                                        for (Row row : rows) {
-                                            String shopName = row.getShopName();
-                                            String category = row.getCategoryName();
-                                            String roadAddress = row.getRoadAddress();
-                                            String locationAddress = row.getLocationAddress();
-                                            String telNumber = row.getTelNumber();
-                                            String latitude = row.getLatitude();
-                                            String longitude = row.getLongitude();
-                                            DataModel data = new DataModel(shopName, category, roadAddress,
-                                                    locationAddress, telNumber, latitude, longitude);
-                                            dataModels.add(data);
-                                            if (dataModels.size() != 0) {
-                                                progressDialog.setMessage((dataModels.size()*100/listTotalCount)+"%\n"+dataModels.size() + "개의 데이터 저장중...");
+                        for (int pIndex = 1; pIndex <= indexEnd; pIndex++) {
+                            call = service.getSearchCity(getString(R.string.api_key), "json", pIndex, city);
+                            call.enqueue(new Callback<GmoneyClass>() {
+                                @Override
+                                public void onResponse(@NotNull Call<GmoneyClass> call, @NotNull Response<GmoneyClass> response) {
+                                    if (response.isSuccessful()) {
+                                        GmoneyClass result = response.body();
+                                        List<RegionMnyFacltStu> regionMnyFacltStus = result.getRegionMnyFacltStus();
+                                        List<Head> heads = regionMnyFacltStus.get(0).getHead();
+                                        RESULT results = heads.get(1).getRESULT();
+                                        if (results.getCODE().equals("INFO-000")) {
+                                            List<Row> rows = regionMnyFacltStus.get(1).getRow();
+                                            for (Row row : rows) {
+                                                String shopName = row.getShopName();
+                                                String category = row.getCategoryName();
+                                                String roadAddress = row.getRoadAddress();
+                                                String locationAddress = row.getLocationAddress();
+                                                String telNumber = row.getTelNumber();
+                                                String latitude = row.getLatitude();
+                                                String longitude = row.getLongitude();
+                                                DataModel data = new DataModel(shopName, category, roadAddress,
+                                                        locationAddress, telNumber, latitude, longitude);
+                                                dataModels.add(data);
+                                                if (dataModels.size() != 0) {
+                                                    progressDialog.setMessage((dataModels.size()*100/listTotalCount)+"%\n"+dataModels.size() + "개의 데이터 저장중...");
+                                                }
+                                                if (dataModels.size() == listTotalCount) {
+                                                    Toast.makeText(DownloadActivity.this, "다운로드를 완료했습니다.", Toast.LENGTH_SHORT).show();
+                                                    progressDialog.dismiss();
+
+                                                    Gson gson = new GsonBuilder().create();
+                                                    Type listType = new TypeToken<ArrayList<DataModel>>() {
+                                                    }.getType();
+                                                    String strDataModels = gson.toJson(dataModels, listType);
+
+                                                    SharedPreferences sharedPreferences = getSharedPreferences("cityData", MODE_PRIVATE);
+                                                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                                                    editor.putString(city, strDataModels);
+                                                    editor.apply();
+
+                                                    onStart();
+                                                }
                                             }
-                                            if (dataModels.size() == listTotalCount) {
-                                                Toast.makeText(DownloadActivity.this, "다운로드를 완료했습니다.", Toast.LENGTH_SHORT).show();
-                                                progressDialog.dismiss();
-
-                                                Gson gson = new GsonBuilder().create();
-                                                Type listType = new TypeToken<ArrayList<DataModel>>() {
-                                                }.getType();
-                                                String strDataModels = gson.toJson(dataModels, listType);
-
-                                                SharedPreferences sharedPreferences = getSharedPreferences("cityData", MODE_PRIVATE);
-                                                SharedPreferences.Editor editor = sharedPreferences.edit();
-                                                editor.putString(city, strDataModels);
-                                                editor.apply();
-
-                                                onStart();
-                                            }
+                                        } else {
+                                            progressDialog.setMessage(results.getCODE());
+                                            progressDialog.show();
                                         }
-                                    } else {
-                                        progressDialog.setMessage(results.getCODE());
-                                        progressDialog.show();
                                     }
                                 }
-                            }
 
-                            @Override
-                            public void onFailure(@NotNull Call<GmoneyClass> call, @NotNull Throwable t) {
-                                Toast.makeText(DownloadActivity.this, "다시 시도해주세요.", Toast.LENGTH_SHORT).show();
-                                progressDialog.dismiss();
-                            }
-                        });
+                                @Override
+                                public void onFailure(@NotNull Call<GmoneyClass> call, @NotNull Throwable t) {
+                                    Toast.makeText(DownloadActivity.this, "다시 시도해주세요.", Toast.LENGTH_SHORT).show();
+                                    progressDialog.dismiss();
+                                }
+                            });
+                        }
+                    } else {
+                        progressDialog.dismiss();
+                        AlertDialog.Builder builder = new AlertDialog.Builder(DownloadActivity.this);
+                        builder.setMessage(city+"는 더 이상 데이터를 제공하지 않습니다.")
+                                .setPositiveButton("확인", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+//                                        onBackPressed();
+                                    }
+                                });
+                        AlertDialog dialog = builder.create();
+                        dialog.show();
                     }
                 }
             }

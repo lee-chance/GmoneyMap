@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentStatePagerAdapter;
 
+import com.chance.gmoneymap.Fragments.DownloadFragment;
 import com.chance.gmoneymap.Fragments.MenuFragment;
 import com.chance.gmoneymap.Fragments.NotifyFragment;
 import com.chance.gmoneymap.Fragments.SearchFragment;
@@ -22,7 +23,7 @@ public class ViewPagerAdapter extends FragmentStatePagerAdapter {
     public Fragment getItem(int position) {
         switch (position) {
             case 0:
-                return new NotifyFragment();
+                return new DownloadFragment();
             case 1:
                 return new SearchFragment();
             case 2:

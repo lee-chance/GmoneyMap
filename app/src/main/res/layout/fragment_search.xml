@@ -61,13 +61,13 @@
 
     </LinearLayout>
 
-    <ImageButton
-        android:id="@+id/btn_searchFromMe"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:src="@drawable/ic_search"
-        android:background="@null"
-        android:layout_gravity="center" />
+<!--    <ImageButton-->
+<!--        android:id="@+id/btn_searchFromMe"-->
+<!--        android:layout_width="48dp"-->
+<!--        android:layout_height="48dp"-->
+<!--        android:src="@drawable/ic_search"-->
+<!--        android:background="@null"-->
+<!--        android:layout_gravity="center" />-->
 
 <!--
     <ImageButton

@@ -6,6 +6,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.Signature;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.ColorDrawable;
@@ -15,6 +18,7 @@ import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.util.Base64;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -57,6 +61,8 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Type;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -179,13 +185,21 @@ public class MapActivity extends AppCompatActivity {
             }
         });
 
-        TextView tv_warning = findViewById(R.id.tv_warning);
-        tv_warning.setSelected(true);
-        tv_warning.setOnClickListener(new View.OnClickListener() {
+//        TextView tv_warning = findViewById(R.id.tv_warning);
+//        tv_warning.setSelected(true);
+//        tv_warning.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Intent intent = new Intent(getApplicationContext(), DownloadActivity.class);
+//                startActivity(intent);
+//            }
+//        });
+
+        tv_address.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), DownloadActivity.class);
-                startActivity(intent);
+            public void onClick(View view) {
+                TabLayout.Tab newTab =  tabLayout.getTabAt(1);
+                newTab.select();
             }
         });
     }
@@ -196,7 +210,8 @@ public class MapActivity extends AppCompatActivity {
         bottomSheetBehavior = BottomSheetBehavior.from(nestedScrollView);
 
         //init tab layout
-        tabLayout.addTab(tabLayout.newTab().setText("알리미").setIcon(R.drawable.ic_notifications));
+        tabLayout.addTab(tabLayout.newTab().setText("데이터").setIcon(R.drawable.ic_baseline_cloud_download_24));
+//        tabLayout.addTab(tabLayout.newTab().setText("알리미").setIcon(R.drawable.ic_notifications));
         tabLayout.addTab(tabLayout.newTab().setText("검색").setIcon(R.drawable.ic_search));
         tabLayout.addTab(tabLayout.newTab().setText("메뉴").setIcon(R.drawable.ic_menu));
 
@@ -274,6 +289,7 @@ public class MapActivity extends AppCompatActivity {
             tv_myArea.setSelected(false);
             tv_mapArea.setSelected(true);
         }
+        findViewById(R.id.tv_all).setSelected(false);
     }
 
     public void categoryClick(View v) {
@@ -540,6 +556,7 @@ public class MapActivity extends AppCompatActivity {
         MapPoint mapPoint = MapPoint.mapPointWithGeoCoord(pointX, pointY);
         String xyString = pointX + "-" + pointY;
         if (stringList.contains(xyString)) {
+            // 2개 이상의 검색결과는 블루핀으로 찍음
             if (map.get(xyString) == null) {
                 overlapCount = 1;
             } else {
@@ -550,13 +567,14 @@ public class MapActivity extends AppCompatActivity {
             marker.setItemName(overlapCount + "개의 검색결과");
             marker.setMarkerType(MapPOIItem.MarkerType.BluePin);
         } else {
+            // 단일 검색결과는 레드핀으로 찍음
             stringList.add(xyString);
             marker.setItemName(row.getShopName());
             marker.setMarkerType(MapPOIItem.MarkerType.RedPin);
         }
         marker.setMapPoint(mapPoint);
-        marker.setCustomImageAutoscale(false); // hdpi, xhdpi 등 안드로이드 플랫폼의 스케일을 사용할 경우 지도 라이브러리의 스케일 기능을 꺼줌.
-        marker.setCustomImageAnchor(0.5f, 1.0f); // 마커 이미지중 기준이 되는 위치(앵커포인트) 지정 - 마커 이미지 좌측 상단 기준 x(0.0f ~ 1.0f), y(0.0f ~ 1.0f) 값.
+        marker.setCustomImageAutoscale(false);
+        marker.setCustomImageAnchor(0.5f, 1.0f);
         mMapView.addPOIItem(marker);
         tagNum++;
     }
@@ -787,7 +805,9 @@ public class MapActivity extends AppCompatActivity {
         progressDialog.dismiss();
     }
 
+    // openapi에서 데이터 가져오기
     private void requestSearchLocal(final boolean isSelectedCategory) {
+        // 초기화
         stringList = new ArrayList<>();
         rowList = new ArrayList<>();
         map = new HashMap<>();
@@ -795,23 +815,27 @@ public class MapActivity extends AppCompatActivity {
         tagNum = 0;
         rowCount = 0;
 
+        // 프로그래스바
         final ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("불러오는 중...");
         progressDialog.show();
 
+        // Retrofit 연결
         final int radius = 300;
         String base_uri = "https://openapi.gg.go.kr/";
         Retrofit client = new Retrofit.Builder().baseUrl(base_uri).addConverterFactory(GsonConverterFactory.create()).build();
         final ApiInterface service = client.create(ApiInterface.class);
 
-
         if (city == null) {
+            // 경기도가 아닐 때
             Toast.makeText(this, "경기도가 아닙니다.", Toast.LENGTH_SHORT).show();
             progressDialog.dismiss();
         } else if (city.equals("error")) {
+            // 에러
             Toast.makeText(this, "위치를 찾을 수 없습니다.", Toast.LENGTH_SHORT).show();
             progressDialog.dismiss();
         } else {
+            // 검색실행
             Call<GmoneyClass> call = service.getSearchCity(getString(R.string.api_key), "json", 1, city);
             call.enqueue(new Callback<GmoneyClass>() {
                 @Override
@@ -871,6 +895,7 @@ public class MapActivity extends AppCompatActivity {
                                                         String targetY = row.getLongitude();
                                                         int distance = (int) (Math.sqrt(Math.pow(Double.parseDouble(targetX) - latitude, 2) + Math.pow(Double.parseDouble(targetY) - longitude, 2)) * 100000);
                                                         if (distance < radius) {
+                                                            // 거리 300이내에만 표시
                                                             setNewMarker(row);
                                                         }
                                                     }
