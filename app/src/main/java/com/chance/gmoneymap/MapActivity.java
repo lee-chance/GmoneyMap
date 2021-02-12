@@ -290,6 +290,9 @@ public class MapActivity extends AppCompatActivity {
             tv_mapArea.setSelected(true);
         }
         findViewById(R.id.tv_all).setSelected(false);
+        for (int value : tv_category) {
+            findViewById(value).setSelected(false);
+        }
     }
 
     public void categoryClick(View v) {
@@ -843,80 +846,95 @@ public class MapActivity extends AppCompatActivity {
                     if (response.isSuccessful()) {
                         GmoneyClass result = response.body();
                         List<RegionMnyFacltStu> regionMnyFacltStus = result.getRegionMnyFacltStus();
-                        List<Head> heads = regionMnyFacltStus.get(0).getHead();
-                        final Integer listTotalCount = heads.get(0).getListTotalCount();
-                        int indexEnd = listTotalCount / 100 + 1;
+                        if(regionMnyFacltStus != null) {
+                            List<Head> heads = regionMnyFacltStus.get(0).getHead();
+                            final Integer listTotalCount = heads.get(0).getListTotalCount();
+                            int indexEnd = listTotalCount / 100 + 1;
 
-                        //circle 생성
-                        MapCircle circle = new MapCircle(
-                                MapPoint.mapPointWithGeoCoord(latitude, longitude), // center
-                                radius, // radius
-                                Color.argb(70, 1, 104, 179), // strokeColor
-                                Color.argb(30, 1, 104, 179) // fillColor
-                        );
-                        circle.setTag(5678);
-                        mMapView.addCircle(circle);
+                            //circle 생성
+                            MapCircle circle = new MapCircle(
+                                    MapPoint.mapPointWithGeoCoord(latitude, longitude), // center
+                                    radius, // radius
+                                    Color.argb(70, 1, 104, 179), // strokeColor
+                                    Color.argb(30, 1, 104, 179) // fillColor
+                            );
+                            circle.setTag(5678);
+                            mMapView.addCircle(circle);
 
-                        for (int pIndex = 1; pIndex <= indexEnd; pIndex++) {
-                            call = service.getSearchCity(getString(R.string.api_key), "json", pIndex, city);
-                            call.enqueue(new Callback<GmoneyClass>() {
-                                @Override
-                                public void onResponse(@NotNull Call<GmoneyClass> call, @NotNull Response<GmoneyClass> response) {
-                                    if (response.isSuccessful()) {
-                                        GmoneyClass result = response.body();
-                                        List<RegionMnyFacltStu> regionMnyFacltStus = result.getRegionMnyFacltStus();
-                                        List<Head> heads = regionMnyFacltStus.get(0).getHead();
-                                        RESULT results = heads.get(1).getRESULT();
-                                        if (results.getCODE().equals("INFO-000")) {
-                                            List<Row> rows = regionMnyFacltStus.get(1).getRow();
-                                            for (Row row : rows) {
-                                                rowCount++;
-                                                String category = row.getCategoryName();
-                                                if (isSelectedCategory) {
-                                                    if (category != null && categoryList.contains(category)) {
+                            for (int pIndex = 1; pIndex <= indexEnd; pIndex++) {
+                                call = service.getSearchCity(getString(R.string.api_key), "json", pIndex, city);
+                                call.enqueue(new Callback<GmoneyClass>() {
+                                    @Override
+                                    public void onResponse(@NotNull Call<GmoneyClass> call, @NotNull Response<GmoneyClass> response) {
+                                        if (response.isSuccessful()) {
+                                            GmoneyClass result = response.body();
+                                            List<RegionMnyFacltStu> regionMnyFacltStus = result.getRegionMnyFacltStus();
+                                            List<Head> heads = regionMnyFacltStus.get(0).getHead();
+                                            RESULT results = heads.get(1).getRESULT();
+                                            if (results.getCODE().equals("INFO-000")) {
+                                                List<Row> rows = regionMnyFacltStus.get(1).getRow();
+                                                for (Row row : rows) {
+                                                    rowCount++;
+                                                    String category = row.getCategoryName();
+                                                    if (isSelectedCategory) {
+                                                        if (category != null && categoryList.contains(category)) {
+                                                            if (row.getLatitude() != null && row.getLongitude() != null) {
+                                                                String targetX = row.getLatitude();
+                                                                String targetY = row.getLongitude();
+                                                                int distance = (int) (Math.sqrt(Math.pow(Double.parseDouble(targetX) - latitude, 2) + Math.pow(Double.parseDouble(targetY) - longitude, 2)) * 100000);
+                                                                if (distance < radius) {
+                                                                    setNewMarker(row);
+                                                                }
+                                                            }
+                                                        }
+                                                        if (rowCount == listTotalCount) {
+                                                            progressDialog.dismiss();
+                                                            stringList.clear();
+                                                            categoryList.clear();
+                                                            Toast.makeText(MapActivity.this, "검색을 완료했습니다.", Toast.LENGTH_SHORT).show();
+                                                        }
+                                                    } else {
                                                         if (row.getLatitude() != null && row.getLongitude() != null) {
                                                             String targetX = row.getLatitude();
                                                             String targetY = row.getLongitude();
                                                             int distance = (int) (Math.sqrt(Math.pow(Double.parseDouble(targetX) - latitude, 2) + Math.pow(Double.parseDouble(targetY) - longitude, 2)) * 100000);
                                                             if (distance < radius) {
+                                                                // 거리 300이내에만 표시
                                                                 setNewMarker(row);
                                                             }
                                                         }
-                                                    }
-                                                    if (rowCount == listTotalCount) {
-                                                        progressDialog.dismiss();
-                                                        stringList.clear();
-                                                        categoryList.clear();
-                                                        Toast.makeText(MapActivity.this, "검색을 완료했습니다.", Toast.LENGTH_SHORT).show();
-                                                    }
-                                                } else {
-                                                    if (row.getLatitude() != null && row.getLongitude() != null) {
-                                                        String targetX = row.getLatitude();
-                                                        String targetY = row.getLongitude();
-                                                        int distance = (int) (Math.sqrt(Math.pow(Double.parseDouble(targetX) - latitude, 2) + Math.pow(Double.parseDouble(targetY) - longitude, 2)) * 100000);
-                                                        if (distance < radius) {
-                                                            // 거리 300이내에만 표시
-                                                            setNewMarker(row);
+                                                        if (rowCount == listTotalCount) {
+                                                            progressDialog.dismiss();
+                                                            Toast.makeText(MapActivity.this, "검색을 완료했습니다.", Toast.LENGTH_SHORT).show();
                                                         }
                                                     }
-                                                    if (rowCount == listTotalCount) {
-                                                        progressDialog.dismiss();
-                                                        Toast.makeText(MapActivity.this, "검색을 완료했습니다.", Toast.LENGTH_SHORT).show();
-                                                    }
                                                 }
+                                            } else {
+                                                progressDialog.setMessage(results.getCODE());
+                                                progressDialog.show();
                                             }
-                                        } else {
-                                            progressDialog.setMessage(results.getCODE());
-                                            progressDialog.show();
                                         }
                                     }
-                                }
 
-                                @Override
-                                public void onFailure(@NotNull Call<GmoneyClass> call, @NotNull Throwable t) {
-                                }
-                            });
+                                    @Override
+                                    public void onFailure(@NotNull Call<GmoneyClass> call, @NotNull Throwable t) {
+                                    }
+                                });
+                            }
+                        } else {
+                            progressDialog.dismiss();
+                            AlertDialog.Builder builder = new AlertDialog.Builder(MapActivity.this);
+                            builder.setMessage(city+"는 더 이상 데이터를 제공하지 않습니다.")
+                                    .setPositiveButton("확인", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+//                                            onBackPressed();
+                                        }
+                                    });
+                            AlertDialog dialog = builder.create();
+                            dialog.show();
                         }
+
                     }
                 }
 

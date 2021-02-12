@@ -26,9 +26,9 @@
                 android:id="@+id/tv_address"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="30sp"
+                android:layout_marginStart="30dp"
                 android:layout_marginTop="16dp"
-                android:layout_marginEnd="30sp"
+                android:layout_marginEnd="30dp"
                 android:layout_marginBottom="12dp"
                 android:background="@drawable/shape_addressbar"
                 android:elevation="6dp"
@@ -40,8 +40,8 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="60dp"
-                android:layout_marginEnd="60dp">
+                android:layout_marginStart="30dp"
+                android:layout_marginEnd="30dp">
                 <TextView
                     android:id="@+id/tv_myArea"
                     android:layout_width="0dp"
@@ -70,8 +70,6 @@
                 android:id="@+id/scrollView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingTop="10dp"
-                android:paddingBottom="10dp"
                 android:scrollbars="none">
 
                 <LinearLayout
@@ -82,7 +80,7 @@
                         android:id="@+id/tv_all"
                         android:text="모두보기"
                         style="@style/CategoryTextView"
-                        android:layout_marginStart="20dp"
+                        android:layout_marginStart="16dp"
                         android:onClick="categoryClick"/>
 
                     <TextView
@@ -197,6 +195,7 @@
                         android:id="@+id/tv_etc"
                         android:text="기타"
                         style="@style/CategoryTextView"
+                        android:layout_marginEnd="16dp"
                         android:onClick="categoryClick" />
                 </LinearLayout>
             </HorizontalScrollView>
