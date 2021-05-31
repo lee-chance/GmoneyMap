@@ -6,9 +6,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.content.pm.Signature;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.ColorDrawable;
@@ -18,7 +15,6 @@ import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.util.Base64;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -30,7 +26,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.annotation.ColorRes;
 import androidx.cardview.widget.CardView;
 import androidx.core.content.ContextCompat;
 import androidx.core.widget.NestedScrollView;
@@ -61,8 +57,6 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Type;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -78,7 +72,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class MapActivity extends AppCompatActivity {
+public class MapActivity extends BaseActivity {
 
     private MapView mMapView;
 
@@ -86,10 +80,6 @@ public class MapActivity extends AppCompatActivity {
     private double latitude, longitude;
     private MapPoint currentMapPoint;
     private LocationManager locationManager;
-
-    //Back button
-    private static final long FINISH_INTERVAL_TIME = 2000;
-    private long backPressedTime = 0;
 
     int tagNum;
     int overlapCount;
@@ -119,40 +109,30 @@ public class MapActivity extends AppCompatActivity {
 
     private boolean fullScreen = true;
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        MapView.clearMapTilePersistentCache();
-    }
-
-    @Override
-    protected void onStart() {
-        MapView.setMapTilePersistentCacheEnabled(true);
-        super.onStart();
-    }
+//    @Override
+//    protected void onDestroy() {
+//        super.onDestroy();
+//        MapView.clearMapTilePersistentCache();
+//    }
+//
+//    @Override
+//    protected void onStart() {
+//        MapView.setMapTilePersistentCacheEnabled(true);
+//        super.onStart();
+//    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
 
-        //initialize
-        ll_top = findViewById(R.id.ll_top);
-        fab_gps = findViewById(R.id.fab_gps);
-        nestedScrollView = findViewById(R.id.nestedScrollView);
-        tabLayout = findViewById(R.id.tabLayout);
-        viewPager = findViewById(R.id.viewPager);
-        tv_address = findViewById(R.id.tv_address);
-        tv_myArea = findViewById(R.id.tv_myArea);
-        tv_mapArea = findViewById(R.id.tv_mapArea);
+        // binding & initialize
+        initialize();
 
-        //initialize view
         initView();
-        tv_myArea.setSelected(true);
-        tv_mapArea.setSelected(false);
-        //initialize map
         initMap();
 
+        // 검색
         final Row newRow = getIntent().getParcelableExtra("newRow");
         if (newRow != null) {
             mMapView.removeAllCircles();
@@ -198,13 +178,34 @@ public class MapActivity extends AppCompatActivity {
         tv_address.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                TabLayout.Tab newTab =  tabLayout.getTabAt(1);
+                TabLayout.Tab newTab = tabLayout.getTabAt(1);
                 newTab.select();
             }
         });
     }
 
+    private void initialize() {
+        // binding
+        ll_top = findViewById(R.id.ll_top);
+        fab_gps = findViewById(R.id.fab_gps);
+        nestedScrollView = findViewById(R.id.nestedScrollView);
+        tabLayout = findViewById(R.id.tabLayout);
+        viewPager = findViewById(R.id.viewPager);
+        tv_address = findViewById(R.id.tv_address);
+        tv_myArea = findViewById(R.id.tv_myArea);
+        tv_mapArea = findViewById(R.id.tv_mapArea);
+
+        // default
+        tv_myArea.setSelected(true);
+        tv_mapArea.setSelected(false);
+    }
+
     private void initView() {
+        setBottomTabLayout();
+        setBottomViewPager();
+    }
+
+    private void setBottomTabLayout() {
         //init nested scroll view
         nestedScrollView.setFillViewport(true);
         bottomSheetBehavior = BottomSheetBehavior.from(nestedScrollView);
@@ -215,10 +216,6 @@ public class MapActivity extends AppCompatActivity {
         tabLayout.addTab(tabLayout.newTab().setText("검색").setIcon(R.drawable.ic_search));
         tabLayout.addTab(tabLayout.newTab().setText("메뉴").setIcon(R.drawable.ic_menu));
 
-        ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager(), tabLayout.getTabCount());
-        viewPager.setAdapter(viewPagerAdapter);
-
-        viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
@@ -226,14 +223,12 @@ public class MapActivity extends AppCompatActivity {
                 if (bottomSheetBehavior.getState() != BottomSheetBehavior.STATE_EXPANDED) {
                     bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
                 }
-                int tabIconColor = ContextCompat.getColor(getApplicationContext(), R.color.colorPrimaryLighter);
-                tab.getIcon().setColorFilter(tabIconColor, PorterDuff.Mode.SRC_IN);
+                setTabIconColor(tab, R.color.colorPrimaryLighter);
             }
 
             @Override
             public void onTabUnselected(TabLayout.Tab tab) {
-                int tabIconColor = ContextCompat.getColor(getApplicationContext(), android.R.color.black);
-                tab.getIcon().setColorFilter(tabIconColor, PorterDuff.Mode.SRC_IN);
+                setTabIconColor(tab, android.R.color.black);
             }
 
             @Override
@@ -242,12 +237,24 @@ public class MapActivity extends AppCompatActivity {
         });
     }
 
+    private void setBottomViewPager() {
+        ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager(), tabLayout.getTabCount());
+        viewPager.setAdapter(viewPagerAdapter);
+
+        viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
+    }
+
+    private void setTabIconColor(TabLayout.Tab tab, @ColorRes int id) {
+        int tabIconColor = ContextCompat.getColor(getApplicationContext(), id);
+        tab.getIcon().setColorFilter(tabIconColor, PorterDuff.Mode.SRC_IN);
+    }
+
     private void initMap() {
         mMapView = new MapView(this);
         ViewGroup mapViewContainer = findViewById(R.id.mMapView);
         mapViewContainer.addView(mMapView);
 
-        MapView.setMapTilePersistentCacheEnabled(true);
+//        MapView.setMapTilePersistentCacheEnabled(true);
         mMapView.setPOIItemEventListener(poiItemEventListener);
         mMapView.setMapViewEventListener(mapViewEventListener);
     }
@@ -282,25 +289,24 @@ public class MapActivity extends AppCompatActivity {
     }
 
     public void toggleSearchWhere(View view) {
-        if (view.getId() == R.id.tv_myArea) {
-            tv_myArea.setSelected(true);
-            tv_mapArea.setSelected(false);
-        } else if (view.getId() == R.id.tv_mapArea) {
-            tv_myArea.setSelected(false);
-            tv_mapArea.setSelected(true);
-        }
+        boolean isSelectedMyArea = view.getId() == R.id.tv_myArea; // or tv_mapArea
+        tv_myArea.setSelected(isSelectedMyArea);
+        tv_mapArea.setSelected(!isSelectedMyArea);
+        setCategoryDeselected();
+    }
+
+    private void setCategoryDeselected() {
         findViewById(R.id.tv_all).setSelected(false);
         for (int value : tv_category) {
             findViewById(value).setSelected(false);
         }
     }
 
+    // 검색시작
     public void categoryClick(View v) {
-        findViewById(R.id.tv_all).setSelected(false);
-        for (int value : tv_category) {
-            findViewById(value).setSelected(false);
-        }
+        setCategoryDeselected();
 
+        // 저장되어 있는 현재도시 불러오기
         SharedPreferences sharedPreferences = getSharedPreferences("cityData", MODE_PRIVATE);
         String cityData = sharedPreferences.getString(city, null);
 
@@ -325,31 +331,28 @@ public class MapActivity extends AppCompatActivity {
     private void actionSearch(View v, String cityData) {
         if (v.getId() == R.id.tv_all) {
             findViewById(R.id.tv_all).setSelected(true);
-            if (cityData == null) {
-                try {
-                    requestSearchLocal(false);
-                } catch (Exception e) {
-                    Toast.makeText(this, "불러오기 오류! 다시 시도해주세요.", Toast.LENGTH_SHORT).show();
-                }
-            } else {
-                searchLocalFromDB(cityData, false);
-            }
+            search(cityData, false);
         } else {
             for (int i = 0; i < tv_category.length; i++) {
                 if (v.getId() == tv_category[i]) {
                     findViewById(tv_category[i]).setSelected(true);
                     categoryExcel(i);
-                    if (cityData == null) {
-                        try {
-                            requestSearchLocal(true);
-                        } catch (Exception e) {
-                            Toast.makeText(this, "불러오기 오류! 다시 시도해주세요.", Toast.LENGTH_SHORT).show();
-                        }
-                    } else {
-                        searchLocalFromDB(cityData, true);
-                    }
+                    search(cityData, true);
+                    return;
                 }
             }
+        }
+    }
+
+    private void search(String data, boolean isSelectedCategory) {
+        if (data == null) {
+            try {
+                requestSearchLocal(isSelectedCategory);
+            } catch (Exception e) {
+                Toast.makeText(this, "불러오기 오류! 다시 시도해주세요.", Toast.LENGTH_SHORT).show();
+            }
+        } else {
+            searchLocalFromDB(data, isSelectedCategory);
         }
     }
 
@@ -617,20 +620,12 @@ public class MapActivity extends AppCompatActivity {
         if (bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED) {
             bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
         } else {
-            long tempTime = System.currentTimeMillis();
-            long intervalTime = tempTime - backPressedTime;
-
-            if (0 <= intervalTime && FINISH_INTERVAL_TIME >= intervalTime) {
-                super.onBackPressed();
-            } else {
-                backPressedTime = tempTime;
-                Toast.makeText(getApplicationContext(), "뒤로가기를 한번 더 누르면 종료됩니다.", Toast.LENGTH_SHORT).show();
-            }
+            super.onBackPressed();
         }
     }
 
     // Listener Part
-    private MapView.MapViewEventListener mapViewEventListener = new MapView.MapViewEventListener() {
+    private final MapView.MapViewEventListener mapViewEventListener = new MapView.MapViewEventListener() {
         @Override
         public void onMapViewInitialized(MapView mapView) {
         }
@@ -651,7 +646,6 @@ public class MapActivity extends AppCompatActivity {
             } else {
                 showTabs();
             }
-
         }
 
         @Override
@@ -660,12 +654,10 @@ public class MapActivity extends AppCompatActivity {
 
         @Override
         public void onMapViewLongPressed(MapView mapView, MapPoint mapPoint) {
-
         }
 
         @Override
         public void onMapViewDragStarted(MapView mapView, MapPoint mapPoint) {
-
         }
 
         @Override
@@ -680,11 +672,12 @@ public class MapActivity extends AppCompatActivity {
         }
     };
 
-    private MapView.CurrentLocationEventListener currentLocationEventListener = new MapView.CurrentLocationEventListener() {
+    private final MapView.CurrentLocationEventListener currentLocationEventListener = new MapView.CurrentLocationEventListener() {
         @Override
         public void onCurrentLocationUpdate(MapView mapView, MapPoint mapPoint, float v) {
             MapPoint.GeoCoordinate mapPointGeo = mapPoint.getMapPointGeoCoord();
-            currentMapPoint = MapPoint.mapPointWithGeoCoord(mapPointGeo.latitude, mapPointGeo.longitude);
+//            currentMapPoint = MapPoint.mapPointWithGeoCoord(mapPointGeo.latitude, mapPointGeo.longitude);
+            currentMapPoint = mapPoint;
             //이 좌표로 지도 중심 이동
             mapView.setMapCenterPoint(currentMapPoint, true);
             //전역변수로 현재 좌표 저장
@@ -717,7 +710,7 @@ public class MapActivity extends AppCompatActivity {
         }
     };
 
-    private MapView.POIItemEventListener poiItemEventListener = new MapView.POIItemEventListener() {
+    private final MapView.POIItemEventListener poiItemEventListener = new MapView.POIItemEventListener() {
         @Override
         public void onPOIItemSelected(MapView mapView, MapPOIItem mapPOIItem) {
 
@@ -730,22 +723,36 @@ public class MapActivity extends AppCompatActivity {
 
         @Override
         public void onCalloutBalloonOfPOIItemTouched(MapView mapView, MapPOIItem mapPOIItem, MapPOIItem.CalloutBalloonButtonType calloutBalloonButtonType) {
-            if (mapPOIItem.getMarkerType() == MapPOIItem.MarkerType.YellowPin) {
-                detailDialog(0, searchRowList);
-            } else if (mapPOIItem.getMarkerType() == MapPOIItem.MarkerType.BluePin) {
-                overlapDialog(mapPOIItem);
-            } else if (mapPOIItem.getMarkerType() == MapPOIItem.MarkerType.RedPin) {
-                if (rowList == null) {
+            switch (mapPOIItem.getMarkerType()) {
+                case YellowPin:
+                    detailDialog(0, searchRowList);
+                    break;
+                case BluePin:
                     overlapDialog(mapPOIItem);
-                } else {
-                    detailDialog(mapPOIItem.getTag(), rowList);
-                }
+                    break;
+                case RedPin:
+                    if (rowList == null) {
+                        overlapDialog(mapPOIItem);
+                    } else {
+                        detailDialog(mapPOIItem.getTag(), rowList);
+                    }
+                    break;
             }
+//            if (mapPOIItem.getMarkerType() == MapPOIItem.MarkerType.YellowPin) {
+//                detailDialog(0, searchRowList);
+//            } else if (mapPOIItem.getMarkerType() == MapPOIItem.MarkerType.BluePin) {
+//                overlapDialog(mapPOIItem);
+//            } else if (mapPOIItem.getMarkerType() == MapPOIItem.MarkerType.RedPin) {
+//                if (rowList == null) {
+//                    overlapDialog(mapPOIItem);
+//                } else {
+//                    detailDialog(mapPOIItem.getTag(), rowList);
+//                }
+//            }
         }
 
         @Override
         public void onDraggablePOIItemMoved(MapView mapView, MapPOIItem mapPOIItem, MapPoint mapPoint) {
-
         }
     };
 
@@ -780,32 +787,27 @@ public class MapActivity extends AppCompatActivity {
             String category = dataModel.getINDUTYPE_NM();
             if (isSelectedCategory) {
                 if (category != null && categoryList.contains(category)) {
-                    if (dataModel.getREFINE_WGS84_LAT() != null && dataModel.getREFINE_WGS84_LOGT() != null) {
-                        String targetX = dataModel.getREFINE_WGS84_LAT();
-                        String targetY = dataModel.getREFINE_WGS84_LOGT();
-                        int distance = (int) (Math.sqrt(Math.pow(Double.parseDouble(targetX) - latitude, 2) + Math.pow(Double.parseDouble(targetY) - longitude, 2)) * 100000);
-                        if (distance < radius) {
-                            Row row = new Row(dataModel.getCMPNM_NM(), dataModel.getINDUTYPE_NM(), dataModel.getTELNO(), dataModel.getREFINE_ROADNM_ADDR(),
-                                    dataModel.getREFINE_LOTNO_ADDR(), dataModel.getREFINE_WGS84_LOGT(), dataModel.getREFINE_WGS84_LAT());
-                            setNewMarker(row);
-                        }
-                    }
+                    setNewMarkerIntoCircle(dataModel, radius);
                 }
             } else {
-                if (dataModel.getREFINE_WGS84_LAT() != null && dataModel.getREFINE_WGS84_LOGT() != null) {
-                    String targetX = dataModel.getREFINE_WGS84_LAT();
-                    String targetY = dataModel.getREFINE_WGS84_LOGT();
-                    int distance = (int) (Math.sqrt(Math.pow(Double.parseDouble(targetX) - latitude, 2) + Math.pow(Double.parseDouble(targetY) - longitude, 2)) * 100000);
-                    if (distance < radius) {
-                        Row row = new Row(dataModel.getCMPNM_NM(), dataModel.getINDUTYPE_NM(), dataModel.getTELNO(), dataModel.getREFINE_ROADNM_ADDR(),
-                                dataModel.getREFINE_LOTNO_ADDR(), dataModel.getREFINE_WGS84_LOGT(), dataModel.getREFINE_WGS84_LAT());
-                        setNewMarker(row);
-                    }
-                }
+                setNewMarkerIntoCircle(dataModel, radius);
             }
         }
         Toast.makeText(MapActivity.this, "검색을 완료했습니다.", Toast.LENGTH_SHORT).show();
         progressDialog.dismiss();
+    }
+
+    private void setNewMarkerIntoCircle(DataModel dataModel, int radius) {
+        if (dataModel.getREFINE_WGS84_LAT() != null && dataModel.getREFINE_WGS84_LOGT() != null) {
+            String targetX = dataModel.getREFINE_WGS84_LAT();
+            String targetY = dataModel.getREFINE_WGS84_LOGT();
+            int distance = (int) (Math.sqrt(Math.pow(Double.parseDouble(targetX) - latitude, 2) + Math.pow(Double.parseDouble(targetY) - longitude, 2)) * 100000);
+            if (distance < radius) {
+                Row row = new Row(dataModel.getCMPNM_NM(), dataModel.getINDUTYPE_NM(), dataModel.getTELNO(), dataModel.getREFINE_ROADNM_ADDR(),
+                        dataModel.getREFINE_LOTNO_ADDR(), dataModel.getREFINE_WGS84_LOGT(), dataModel.getREFINE_WGS84_LAT());
+                setNewMarker(row);
+            }
+        }
     }
 
     // openapi에서 데이터 가져오기
@@ -846,7 +848,7 @@ public class MapActivity extends AppCompatActivity {
                     if (response.isSuccessful()) {
                         GmoneyClass result = response.body();
                         List<RegionMnyFacltStu> regionMnyFacltStus = result.getRegionMnyFacltStus();
-                        if(regionMnyFacltStus != null) {
+                        if (regionMnyFacltStus != null) {
                             List<Head> heads = regionMnyFacltStus.get(0).getHead();
                             final Integer listTotalCount = heads.get(0).getListTotalCount();
                             int indexEnd = listTotalCount / 100 + 1;
@@ -924,7 +926,7 @@ public class MapActivity extends AppCompatActivity {
                         } else {
                             progressDialog.dismiss();
                             AlertDialog.Builder builder = new AlertDialog.Builder(MapActivity.this);
-                            builder.setMessage(city+"는 더 이상 데이터를 제공하지 않습니다.")
+                            builder.setMessage(city + "는 더 이상 데이터를 제공하지 않습니다.")
                                     .setPositiveButton("확인", new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialog, int which) {
